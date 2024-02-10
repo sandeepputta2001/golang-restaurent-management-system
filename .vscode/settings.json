@@ -1,0 +1,11 @@
+{
+    "go.formatTool": "goimports",
+    "go.lintTool": "golangci-lint",
+    "go.vetOnSave": "package",
+    "go.formatTool": "gofumpt",
+
+
+    "json.schemas": [
+
+    ]
+}

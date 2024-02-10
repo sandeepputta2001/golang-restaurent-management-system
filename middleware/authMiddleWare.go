@@ -9,6 +9,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// authentication function is used to authenticate jwt token and set keys from jwt signed details in this request for
+//for further use in request handlers.
 func Authentication() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		clientToken := c.Request.Header.Get("token")
@@ -18,7 +20,7 @@ func Authentication() gin.HandlerFunc {
 			return
 		}
 
-		claims, err := helper.ValidateToken(clientToken)
+		claims, err := helper.ValidateToken(clientToken) 
 
 		if err != "" {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err})

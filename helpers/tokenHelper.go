@@ -56,7 +56,7 @@ func GenerateAllTokens(email string, firstName string, lastName string, uid stri
 	}
 	//jwt.SigningMethodHS256: This indicates that the JWT will be signed using the HMAC-SHA256 algorithm. HMAC (Hash-based Message Authentication Code) is a method for creating a cryptographic hash of the token's content and signing it with a secret key to ensure its integrity and authenticity.
 	//Signing: When a JWT is created and signed with this method, a secret key (or shared secret) is used to create a digital signature of the token's content. This signature is added to the JWT, ensuring that the token has not been tampered with.
-	//Verification: When someone receives a JWT and wants to verify its authenticity, they must also have access to the same secret key. They can use this key to verify the signature and confirm that the token has not been modified since it was signed.
+	//Verification: When someone receives a JWT and wants to verify its authenticity, they must also have access to the same secret key. They can use this key to verify the signature and confirm that the token haodis not been mfied since it was signed.
 	//SigningMethodHS256 : is a term related to JWT (JSON Web Tokens) and is typically used in Go libraries like "github.com/dgrijalva/jwt-go" for signing and verifying JWTs using the HMAC-SHA256 algorithm. HMAC-SHA256 is a widely used cryptographic algorithm for creating and verifying digital signatures.
 	//SignedString([]byte(SECRET_KEY)): This is a method call that signs a JWT with the secret key. Here's how it works:
 
@@ -81,9 +81,9 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId strin
 	updateObj = append(updateObj, bson.E{Key: "token", Value: signedToken})
 	updateObj = append(updateObj, bson.E{Key: "refreshToken", Value: signedRefreshToken})
 
-	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
+	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339)) 
 
-	updateObj = append(updateObj, bson.E{Key: "updated_at", Value: Updated_at})
+	updateObj = append(updateObj, bson.E{Key: "updated_at", Value: Updated_at}) 
 
 	upsert := true
 
@@ -116,8 +116,8 @@ func ValidateToken(signedToken string) (claims *SignedDetails, msg string) {
 		signedToken,      // jwt token to be parsed.
 		&SignedDetails{}, // This is a pointer to an instance of the SignedDetails struct, which is used to store the claims extracted from the JWT. The claims will be populated after a successful parsing.
 
-		func(token *jwt.Token) (interface{}, error) { //n Go, returning an interface{} type from a function is a way to return a value of unspecified type. It's a very flexible feature but should be used with caution because it can make your code less type-safe and harder to understand. It's often used in certain situations, such as when working with data of different types dynamically or when you want to create generic functions. Here are some common scenarios where you might return an interface{} type from a function:
-			return []byte(SECRET_KEY), nil // secret key is used by the server to access the claims of the json token .
+		func(token *jwt.Token) (interface{}, error) {    //n Go, returning an interface{} type from a function is a way to return a value of unspecified type. It's a very flexible feature but should be used with caution because it can make your code less type-safe and harder to understand. It's often used in certain situations, such as when working with data of different types dynamically or when you want to create generic functions. Here are some common scenarios where you might return an interface{} type from a function:
+			return []byte(SECRET_KEY), nil                  // secret key is used by the server to access the claims of the json token .
 		},
 	)
 

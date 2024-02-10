@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"go-restaurent-management-system/database"
 	middleware "go-restaurent-management-system/middleware"
 	"go-restaurent-management-system/routes"
@@ -12,7 +13,8 @@ import (
 
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "food")
 
-func main() {
+func main() { 
+	fmt.Println("this is the starting point")
 
 	port := os.Getenv("PORT")
 
@@ -20,10 +22,10 @@ func main() {
 		port = "8000"
 	}
 
-	router := gin.New()      // The gin.New() function is typically used to create a new instance of the Gin Engine, which represents the router and middleware engine for your web application.
+	router := gin.New()       // The gin.New() function is typically used to create a new instance of the Gin Engine, which represents the router and middleware engine for your web application.
 	router.Use(gin.Logger()) //gin.Logger(): This is a predefined middleware provided by the gin framework. It's a logging middleware that automatically logs information about incoming requests and outgoing responses. When this middleware is used, it will log details such as the HTTP method, URL, status code, and request processing time for each request.
 	routes.UserRoutes(router)
-	router.Use(middleware.Authentication())
+	router.Use(middleware.Authentication()) 
 
 	routes.FoodRoutes(router)
 	routes.MenuRoutes(router)

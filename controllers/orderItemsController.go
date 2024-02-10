@@ -23,20 +23,19 @@ type OrderItemPack struct {
 
 var orderItemCollection *mongo.Collection = database.OpenCollection(database.Client, "orderItem")
 
-func GetOrderItems() gin.HandlerFunc {
+func GetOrderItems() gin.HandlerFunc { 
 	return func(c *gin.Context) {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 
 		result, err := orderItemCollection.Find(ctx, bson.M{}) // empty bson.M{} indicates querying for all the records present in the collection .
 
 		if err != nil {
-			msg := fmt.Sprintf("error occured while finding the orders in the orderItem 	 Collection")
+			msg := fmt.Sprintf("error occured while finding the orders in the orderItem Collection")
 			c.JSON(http.StatusInternalServerError, gin.H{"error": msg})
-			defer cancel()
 			return
 		}
-		defer cancel()
 
 		var allOrderItems []bson.M
 
@@ -70,34 +69,58 @@ func ItemsByOrder(id string) (OrderItems []primitive.M, err error) {
 
 	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 
-	foodMatchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "order_id", Value: id}}}}                                                                                                               // matchStage : obtains the documents which are matched with the given query
-	foodLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "food"}, {Key: "localfield", Value: "food_id"}, {Key: "foreignfield", Value: "food_id"}, {Key: "as", Value: "food"}}}} // lookup stage : it is used to run the query to obtain the fiels of other document using the foreign key field of current document .
+	foodMatchStage := bson.D{{Key: "$match", Value: bson.D{{Key: "order_id", Value: id}}}}                                                                                                                // matchStage : obtains the documents which are matched with the given query
+	foodLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "foods"}, {Key: "localfield", Value: "food_id"}, {Key: "foreignfield", Value: "food_id"}, {Key: "as", Value: "matchedFoods"}}}} // lookup stage : it is used to run the query to obtain the fiels of other document using the foreign key field of current document .
 	// from : used to get the data from the other documents
-	foodUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$food"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}} // afte lookup stage , the result comes as array , with which mongodb won't run . Therefore  , unwind stage is used to convert array form into some other form
+	foodUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$matchedFoods"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}} // afte lookup stage , the result comes as array , with which mongodb won't run . Therefore  , unwind stage is used to convert array form into some other form
 	// path : this keyword gets the document on which unwinding has to be performed
 
-	orderLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "order"}, {Key: "localfield", Value: "order_id"}, {Key: "foreignfield", Value: "order_id"}, {Key: "as", Value: "order"}}}}
-	orderUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$order"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
+	orderLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "orders"}, {Key: "localfield", Value: "order_id"}, {Key: "foreignfield", Value: "order_id"}, {Key: "as", Value: "matchedOrders"}}}}
+	orderUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$matchedOrders"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
 
-	tableLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "table"}, {Key: "localfield", Value: "order.table_id"}, {Key: "foreignfield", Value: "table_id"}, {Key: "as", Value: "table"}}}}
-	tableUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$table"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
+	tableLookUpStage := bson.D{{Key: "$lookup", Value: bson.D{{Key: "from", Value: "tables"}, {Key: "localfield", Value: "order.table_id"}, {Key: "foreignfield", Value: "table_id"}, {Key: "as", Value: "matchedTables"}}}}
+	tableUnwindStage := bson.D{{Key: "$unwind", Value: bson.D{{Key: "path", Value: "$matchedTables"}, {Key: "preserveNullAndEmptyArrays", Value: true}}}}
 	// projectStage is basically to manage the fields to be sent to frontend
-	projectStage := bson.D{
+	projectStage := bson.D{ 
 
 		{Key: "$project", Value: bson.D{
 			{Key: "id", Value: 0},
-			{Key: "amount", Value: "$food.price"},
+			{Key: "amount", Value: "$matchedFoods.price"},
 			{Key: "totat_count", Value: 1},
-			{Key: "food_name", Value: "$food.name"},
-			{Key: "food_image", Value: "$food.food_image"},
-			{Key: "table_number", Value: "$table.table_number"},
-			{Key: "table_id", Value: "$table.table_id"},
-			{Key: "order_id", Value: "$order.order_id"},
-			{Key: "price", Value: "$food.price"},
+			{Key: "food_name", Value: "$matchedFoods.name"},
+			{Key: "food_image", Value: "$matchedFoods.food_image"},
+			{Key: "table_number", Value: "$matchedTables.table_number"},
+			{Key: "table_id", Value: "$matchedTables.table_id"},
+			{Key: "order_id", Value: "$matchedOrders.order_id"},
+			{Key: "price", Value: "$matchedOrders.price"},
 			{Key: "quantity", Value: 1},
-		}}}
+		  },
+	    },
+	}
 
-	groupStage := bson.D{{Key: "$group", Value: bson.D{{Key: "_id", Value: bson.D{{Key: "order_id", Value: "$order_id"}, {Key: "table_id", Value: "$table_id"}, {Key: "table_number", Value: "$table_number"}}}, {Key: "payment_due", Value: bson.D{{Key: "$sum", Value: "$amount"}}}, {Key: "total_count", Value: bson.D{{Key: "$sum", Value: 1}}}, {Key: "order_items", Value: bson.D{{Key: "$push", Value: "$$ROOT"}}}}}}
+	groupStage := bson.D{
+		{Key: "$group", Value: bson.D{
+			 {Key: "_id", Value: bson.D{
+				{Key: "order_id", Value: "$order_id"}, 
+				{Key: "table_id", Value: "$table_id"}, 
+				{Key: "table_number", Value: "$table_number"},
+				},
+			}, 
+		    {Key: "payment_due", Value: bson.D{
+			{Key: "$sum", Value: "$amount"},
+			},
+			},
+		    {Key: "total_count", Value: bson.D{
+			{Key: "$sum", Value: 1},
+			},
+			}, 
+		    {Key: "order_items", Value: bson.D{
+			{Key: "$push", Value: "$$ROOT"},
+		    },
+	        },
+          },
+        },
+    }
 
 	projectStage2 := bson.D{
 		{Key: "$project", Value: bson.D{
@@ -107,7 +130,9 @@ func ItemsByOrder(id string) (OrderItems []primitive.M, err error) {
 			{Key: "total_count", Value: 1},
 			{Key: "table_number", Value: "$_id.table_number"},
 			{Key: "order_items", Value: 1},
-		}}}
+		  },
+	    },
+    }
 
 	result, err := orderItemCollection.Aggregate(ctx, mongo.Pipeline{
 		foodMatchStage,
@@ -214,7 +239,7 @@ func CreateOrderItem() gin.HandlerFunc {
 	}
 }
 
-func UpdateOrderItem() gin.HandlerFunc {
+func UpdateOrderItem() gin.HandlerFunc { 
 	return func(c *gin.Context) {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)

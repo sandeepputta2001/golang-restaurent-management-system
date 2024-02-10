@@ -88,7 +88,7 @@ func GetUser() gin.HandlerFunc {
 		defer cancel()
 		var user models.User
 
-		userId := c.Param("user_id")
+		userId := c.Param("user_id") 
 
 		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
 		if err != nil {
@@ -96,14 +96,14 @@ func GetUser() gin.HandlerFunc {
 			return
 		}
 		c.JSON(http.StatusOK, user)
-	}
+	} 
 }
 
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-		defer cancel()
+		defer cancel() 
 
 		var user models.User
 
@@ -140,7 +140,7 @@ func Login() gin.HandlerFunc {
 		fmt.Println("refresh token", refreshToken)
 		// update all the tokens
 
-		helper.UpdateAllTokens(token, refreshToken, foundUser.User_id)
+		helper.UpdateAllTokens(token, refreshToken, foundUser.User_id) 
 
 		// return status ok
 
@@ -161,7 +161,7 @@ func SignUp() gin.HandlerFunc {
 
 		//convert the incoming data from the http request into golang readable format
 
-		if err := c.BindJSON(&user); err != nil {
+		if err := c.BindJSON(&user); err != nil { 
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
@@ -184,7 +184,7 @@ func SignUp() gin.HandlerFunc {
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while checking for the email"})
 			return
-		}
+		}	
 
 		// hash password
 		password := HashPassword(*user.Password)
@@ -206,7 +206,7 @@ func SignUp() gin.HandlerFunc {
 		user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 
 		user.ID = primitive.NewObjectID() // ObjectID, which is a unique identifier commonly used in MongoDB. Each ObjectID is typically 12 bytes,
-		user.User_id = user.ID.Hex()      //The Hex() method converts the ObjectID to its hexadecimal string representation
+		user.User_id = user.ID.Hex()     //The Hex() method converts the ObjectID to its hexadecimal string representation
 
 		// generate token and refresh token
 

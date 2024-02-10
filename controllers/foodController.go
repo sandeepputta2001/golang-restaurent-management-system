@@ -19,7 +19,7 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
+var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "foods")
 var validate = validator.New()
 
 func GetFoods() gin.HandlerFunc {
@@ -31,7 +31,7 @@ func GetFoods() gin.HandlerFunc {
 		if err != nil || recordPerPage < 1 {
 			recordPerPage = 10
 
-		}
+		} 
 
 		page, err := strconv.Atoi(c.Query("page"))
 		if err != nil {

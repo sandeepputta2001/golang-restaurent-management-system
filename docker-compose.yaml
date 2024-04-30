@@ -1,0 +1,51 @@
+version: '3.8'
+
+services:
+
+  mongo:
+    image: mongo
+    restart: always
+    # environment:
+    #   - MONGO_INITDB_ROOT_USERNAME:admin
+    #   - MONGO_INITDB_ROOT_PASSWORD:password
+    volumes:
+      - backend:/data/db
+    networks:
+      - backend 
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    depends_on: ["mongo"]
+    environment:
+    #   - ME_CONFIG_MONGODB_ADMINUSERNAME:admin
+    #   - ME_CONFIG_MONGODB_ADMINPASSWORD:password
+      - ME_CONFIG_MONGODB_SERVER:mongo 
+    networks:
+      - backend 
+
+
+  app:
+    build:
+      context: ./
+      dockerfile: ./Dockerfile
+    ports:
+        - "8082:8082"
+    restart: always
+    depends_on:
+       ["mongo"] 
+    volumes:
+      - backend:/goapp/volumes
+    networks:
+      - backend 
+
+volumes:
+  backend:
+    external: true
+networks:
+  backend:
+    external: true
+        
+    

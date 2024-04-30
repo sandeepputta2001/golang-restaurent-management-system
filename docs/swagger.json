@@ -1,0 +1,1513 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "CRUP api's for go backend",
+        "title": "go-backend",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:8000",
+    "basePath": "/",
+    "paths": {
+        "/foods": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of foods from the ordercollection in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foods"
+                ],
+                "summary": "Returns slice of foods",
+                "responses": {
+                    "200": {
+                        "description": "slice of orders",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Food"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a food resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foods"
+                ],
+                "summary": "Creates a food  resource",
+                "parameters": [
+                    {
+                        "description": "Food object",
+                        "name": "food",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Food"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New food created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Food"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new food",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/foods/{food_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves  a  food with specific food id from the  orders collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foods"
+                ],
+                "summary": "Retrieves a food with specific food id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "food_id",
+                        "name": "food_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of a speicific food",
+                        "schema": {
+                            "$ref": "#/definitions/models.Food"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing fodd  resource in the foods collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "foods"
+                ],
+                "summary": "Updates an food  resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the food resource to update",
+                        "name": "food_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Food object",
+                        "name": "food",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Food"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "food got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Food"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating food",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/home": {
+            "get": {
+                "description": "Returns home page with introduction and guide",
+                "produces": [
+                    "text/html"
+                ],
+                "summary": "Returns home page",
+                "responses": {
+                    "200": {
+                        "description": "HTML content",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/invoices": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of invoices from the invoiceCollection in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoice"
+                ],
+                "summary": "Returns slice of invoices",
+                "responses": {
+                    "200": {
+                        "description": "slice of invoices ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Invoice"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a invoice resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoice"
+                ],
+                "summary": "Creates a invoice",
+                "parameters": [
+                    {
+                        "description": "Invoice object",
+                        "name": "Invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Invoice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New invoice created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Invoice"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new food",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/invoices/{invoice_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves a invoice  with specific inovoice  id from the  invoices collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoice"
+                ],
+                "summary": "Retrieves a invoice  with specific invoice id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "invoice_id",
+                        "name": "invoice_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of a specific invoice created",
+                        "schema": {
+                            "$ref": "#/definitions/controllers.InvoiceViewFormat"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing invoice  resource in the invoices collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "invoice"
+                ],
+                "summary": "Updates an invoice resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the invoice resource to update",
+                        "name": "invoice_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Invoice object",
+                        "name": "Invoice",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Invoice"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "invoice got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Invoice"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating invoice",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/menu/{menu_id}": {
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing menu resource in the menu collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Updates an menu resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the menu resource to update",
+                        "name": "menu_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Menu object",
+                        "name": "Menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "menu got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating food",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/menus": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of menus from the menucollection in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Returns slice of menus",
+                "responses": {
+                    "200": {
+                        "description": "slice of menus ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Menu"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a menu resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Creates a new menu",
+                "parameters": [
+                    {
+                        "description": "Menu object",
+                        "name": "Menu",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New menu created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new menu",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/menus/{menu_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves a menu with specific menu id from the menu collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "menu"
+                ],
+                "summary": "Retrieves a menu  with specific menu id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "menu_id",
+                        "name": "menu_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of a specific menu",
+                        "schema": {
+                            "$ref": "#/definitions/models.Menu"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orderitems": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of orderitems placed  from the orderitemcollection in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orderitem"
+                ],
+                "summary": "Returns slice of orderitems",
+                "responses": {
+                    "200": {
+                        "description": "slice of orderitems ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.OrderItem"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a new orderitem resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orderitem"
+                ],
+                "summary": "Creates a orderitem  resource",
+                "parameters": [
+                    {
+                        "description": "Orderitem object",
+                        "name": "orderitme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New orderitem created",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new orderitem",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orderitems/{orderitem_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves a orderitem with specific orderitem id from the orderitem collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orderitem"
+                ],
+                "summary": "Retrieves a orderitem with specific orderitem id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "orderitem_id",
+                        "name": "orderitem_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Details of a specific orderitem id",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing orderitem resource in the orderitem collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orderitem"
+                ],
+                "summary": "Updates an oderitem resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the orderitem  resource to update",
+                        "name": "orderitem_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Orderitem object",
+                        "name": "orderitme",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "orderitem  got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating food",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orderitemsorder/{order_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves orderitems placed from the specific order",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "orderitem"
+                ],
+                "summary": "Retrieves orderitems placed from the specific order",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order_id",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "retrieves orderitems placed from specific orderid",
+                        "schema": {
+                            "$ref": "#/definitions/models.OrderItem"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of orders placed from the ordercollection in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Returns slice of orders",
+                "responses": {
+                    "200": {
+                        "description": "slice of orders ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Order"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a order resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Creates a order  resource",
+                "parameters": [
+                    {
+                        "description": "Order object",
+                        "name": "Order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Order"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New order created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Order"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/orders/{order_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves a order with specific order id from the orders collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Retrieves a order with specific order id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "order_id",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of a specific order",
+                        "schema": {
+                            "$ref": "#/definitions/models.Order"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing order resource in the orders collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "order"
+                ],
+                "summary": "Updates an order  resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the order resource to update",
+                        "name": "order_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Order object",
+                        "name": "Order",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Order"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "orders got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Order"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating order",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tables": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Returns an array of tables placed from table collectios in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Returns slice of tables",
+                "responses": {
+                    "200": {
+                        "description": "slice of tables ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Table"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Creates a new table resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Creates a table  resource",
+                "parameters": [
+                    {
+                        "description": "Table object",
+                        "name": "table",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Table"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New table created",
+                        "schema": {
+                            "$ref": "#/definitions/models.Table"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new table",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/tables/{table_id}": {
+            "get": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Retrieves a table with specific table id from the tables collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Retrieves a table  with specific table id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "table_id",
+                        "name": "table_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "table details of specific userid",
+                        "schema": {
+                            "$ref": "#/definitions/models.Table"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "Security.require(true)": []
+                    }
+                ],
+                "description": "Updates an existing table resource in the table collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "table"
+                ],
+                "summary": "Updates an table resource",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "ID of the table resource to update",
+                        "name": "table_id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Table object",
+                        "name": "table",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.Table"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "table got updated with new body",
+                        "schema": {
+                            "$ref": "#/definitions/models.Table"
+                        }
+                    },
+                    "404": {
+                        "description": "Bad Request",
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while updating table",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/login": {
+            "post": {
+                "description": "User gets logged in",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Creates a new login for a user",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "User logged in ",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while logging  a new user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users": {
+            "get": {
+                "description": "Returns an array of users placed from the users collection  in restaurent database.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Returns slice of users",
+                "responses": {
+                    "200": {
+                        "description": "slice of tables ",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.User"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/signup": {
+            "post": {
+                "description": "Creates a new users resource on the server",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Creates a new resource",
+                "parameters": [
+                    {
+                        "description": "User object",
+                        "name": "user",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "New user created",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error while creating a new user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{user_id}": {
+            "get": {
+                "description": "Retrieves a user with specific user id from the users collection",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "user"
+                ],
+                "summary": "Retrieves a user with specific user id",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "user_id",
+                        "name": "user_id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Details of user with specific user_id",
+                        "schema": {
+                            "$ref": "#/definitions/models.User"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error in mongodb",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "definitions": {
+        "controllers.InvoiceViewFormat": {
+            "type": "object",
+            "properties": {
+                "invoice_id": {
+                    "type": "string"
+                },
+                "order_details": {},
+                "order_id": {
+                    "type": "string"
+                },
+                "payment_due": {},
+                "payment_due_date": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "payment_status": {
+                    "type": "string"
+                },
+                "table_number": {}
+            }
+        },
+        "models.Food": {
+            "type": "object",
+            "required": [
+                "food_image",
+                "menu_id",
+                "name",
+                "price"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "food_id": {
+                    "type": "string"
+                },
+                "food_image": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "menu_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "price": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Invoice": {
+            "type": "object",
+            "required": [
+                "order_id",
+                "payment_method",
+                "payment_status"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "invoice_id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "payment_due_date": {
+                    "type": "string"
+                },
+                "payment_method": {
+                    "type": "string"
+                },
+                "payment_status": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Menu": {
+            "type": "object",
+            "required": [
+                "category",
+                "name"
+            ],
+            "properties": {
+                "category": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "end_date": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "menu_id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "start_date": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Order": {
+            "type": "object",
+            "required": [
+                "order_date",
+                "table_id"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_date": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "table_id": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.OrderItem": {
+            "type": "object",
+            "required": [
+                "food_id",
+                "quantity",
+                "unit_price"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "food_id": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "order_id": {
+                    "type": "string"
+                },
+                "order_item_id": {
+                    "type": "string"
+                },
+                "quantity": {
+                    "description": "s- small , m- medium . L -large",
+                    "type": "string"
+                },
+                "unit_price": {
+                    "type": "number"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.Table": {
+            "type": "object",
+            "required": [
+                "number_of_guests",
+                "table_number"
+            ],
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "number_of_guests": {
+                    "type": "integer"
+                },
+                "table_id": {
+                    "type": "string"
+                },
+                "table_number": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                }
+            }
+        },
+        "models.User": {
+            "type": "object",
+            "required": [
+                "email",
+                "first_name",
+                "last_name",
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "avatar": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "first_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "id": {
+                    "type": "string"
+                },
+                "last_name": {
+                    "type": "string",
+                    "maxLength": 100,
+                    "minLength": 2
+                },
+                "password": {
+                    "type": "string",
+                    "minLength": 6
+                },
+                "phone": {
+                    "type": "string"
+                },
+                "refresh_token": {
+                    "type": "string"
+                },
+                "token": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                }
+            }
+        }
+    },
+    "securityDefinitions": {
+        "": {
+            "description": "JWT token for authentication",
+            "type": "apiKey",
+            "name": "token",
+            "in": "header"
+        }
+    }
+}

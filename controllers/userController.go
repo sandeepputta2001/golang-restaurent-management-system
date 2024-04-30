@@ -20,73 +20,84 @@ import (
 
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
 
+// @Summary       Returns slice of users
+// @Description   Returns an array of users placed from the users collection  in restaurent database.
+// @Tags          user
+// @Produce       application/json
+// @Success       200 {array} models.User "slice of tables "
+// @Router        /users [get]
 func GetUsers() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(c *gin.Context) { 
 
-		recordPerPage, err := strconv.Atoi(c.Query("recordPerPage")) // this is related to the skip and limit concept , which is mainly used in pagination .
-		// when we are getting bulk amount of data from database , we use pagination concept to send data to the frontend , in the pagination concept skip tells from where the data should be sent and limit restrcits the amount of data to be sent to the frontend.
-		if err != nil || recordPerPage < 1 {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 
+		recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
+
+		if err != nil || recordPerPage < 1 { 
 			recordPerPage = 10
 
-		}
+		} 
 
 		page, err := strconv.Atoi(c.Query("page"))
-
-		if err != nil || page < 1 {
+		if err != nil {
 			page = 1
 		}
 
-		startIndex := (page - 1) * recordPerPage
-		startIndex, _ = strconv.Atoi(c.Query("startindex"))
+		startIndex := (page - 1) * recordPerPage 
 
-		matchStage := bson.D{{Key: "$match ", Value: bson.D{{}}}}
-		projectStage := bson.D{
-			{Key: "$project", Value: bson.D{
-				{Key: "id", Value: 0},
-				{Key: "total_count", Value: 1},
-				{Key: "user_items", Value: bson.D{{Key: "$slice", Value: []interface{}{"$data", startIndex, recordPerPage}}}}, //{"user_items", bson.D{{"$slice", []interface{}{"$data", startIndex, recordPerPage}}}}: This projection includes the user_items field in the output documents, and it uses the $slice operator to limit the array contained in the user_items field to a specific range. The $slice operator takes three arguments: the source array (in this case, $data), the starting index (specified by startIndex), and the number of elements to include (specified by recordPerPage). This is used for paginating the user_items array.
-			}}}
-		//The $slice operator in MongoDB is used to limit the number of elements in an array that is projected in a query or aggregation pipeline.
-		//This specific line of code is defining a projection for a MongoDB query or aggregation operation, and it's using the $slice operator to limit the elements in an array field called user_items
-		//Key: "$slice": This part specifies that you want to use the $slice operator to modify the user_items field. The $slice operator is used to retrieve a portion (or slice) of an array.
-		//Value: []interface{}{"$data", startIndex, recordPerPage}: This part specifies the arguments for the $slice operator. It's an array of three elements:
+		matchStage := bson.D{{Key: "$match", Value: bson.D{{}}}}
 
-		//"data": This is the source array from which you want to retrieve a slice. It appears to be a reference to another field named data. In MongoDB, $data suggests that it's a field reference and not a literal array.
-		//startIndex: This variable represents the starting index of the slice within the data array. It indicates where the slice should begin.
-		//startIndex: This variable represents the starting index of the slice within the data array. It indicates where the slice should begin.
-		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-		defer cancel()
+		groupStage := bson.D{{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: bson.D{
+				{Key: "_id", Value: "null"}}}, 
+			{Key: "total_count", Value: bson.D{{Key: "$sum", Value: 1}}}, 
+			{Key: "data", Value: bson.D{{Key: "$push", Value: "$$ROOT"}}}}}} 
+			
+		projectStage := bson.D{ 
+			{
+				Key: "$project", Value: bson.D{
+					{Key: "_id", Value: 0},
+					{Key: "total_count", Value: 1},
+					{Key: "users", Value: bson.D{{Key: "$slice", Value: []interface{}{"$data", startIndex, recordPerPage}}}},
+					{Key: "data" , Value: 1},
+				}}}
+
 		result, err := userCollection.Aggregate(ctx, mongo.Pipeline{
-			matchStage,
-			projectStage,
+			matchStage, groupStage, projectStage,
 		})
 
+		
 		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing  all the user documents in the usercolleciton"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing users"})
 			return
 		}
-		// gin.H is of type map[string]interface{} , which is map data structure of key value pairs
-		// bson.M = document with unordered key value pairs
-		// bson.D = document with ordered key value pairs.
 
-		var allUsers []bson.M //collection.Find: This method initiates a query on a MongoDB collection. It returns a cursor pointing to the result set that matches the specified query.
+		var allUsers []bson.M
 
 		if err := result.All(ctx, &allUsers); err != nil {
 			log.Fatal(err)
 		}
 
-		c.JSON(http.StatusOK, allUsers[0])
-
+		c.JSON(http.StatusOK, allUsers)
 	}
 }
 
+// @Summary       Retrieves a user with specific user id
+// @Description   Retrieves a user with specific user id from the users collection
+// @Tags          user
+// @Accept        application/json
+// @Produce       application/json
+// @Param         user_id path string true "user_id"
+// @Success       200 {object} models.User "Details of user with specific user_id"
+// @Failure       500 {string} http.StatusInternalServerError "Internal Server Error in mongodb"
+// @Router        /users/{user_id} [get]
 func GetUser() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
-		var user models.User
+		var user models.User 
 
 		userId := c.Param("user_id") 
 
@@ -99,6 +110,15 @@ func GetUser() gin.HandlerFunc {
 	} 
 }
 
+// @Summary       Creates a new login for a user 
+// @Description   User gets logged in 
+// @Tags          user
+// @Accept        application/json
+// @Produce       application/json
+// @Param         user body models.User true  "User object"
+// @Success       200 {object} models.User "User logged in "
+// @Failure       500 {string} http.StatusInternalServerError "Internal Server Error while logging  a new user"
+// @Router        /user/login [post]
 func Login() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -117,7 +137,7 @@ func Login() gin.HandlerFunc {
 
 		// find a user with the emailid and check whether the user already exits
 
-		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)
+		err := userCollection.FindOne(ctx, bson.M{"email": user.Email}).Decode(&foundUser)  
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while finding the document"})
@@ -151,6 +171,15 @@ func Login() gin.HandlerFunc {
 	}
 }
 
+// @Summary       Creates a new resource
+// @Description   Creates a new users resource on the server
+// @Tags          user
+// @Accept        application/json
+// @Produce       application/json
+// @Param         user body models.User true  "User object"
+// @Success       201 {object} models.User "New user created"
+// @Failure       500 {string} http.StatusInternalServerError "Internal Server Error while creating a new user"
+// @Router        /users/signup [post]
 func SignUp() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -161,14 +190,14 @@ func SignUp() gin.HandlerFunc {
 
 		//convert the incoming data from the http request into golang readable format
 
-		if err := c.BindJSON(&user); err != nil { 
+		if err := c.BindJSON(&user); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err})
 			return
 		}
 
-		fmt.Println(user)
+		fmt.Println(user) 
 
-		// validate the data using the struct method
+		// validate the data using the struct method 
 
 		validationErr := validate.Struct(user)
 
@@ -179,16 +208,14 @@ func SignUp() gin.HandlerFunc {
 
 		// checking whether the email is already existing in the database
 
-		emailCount, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
+		emailCount, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email}) 
 
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while checking for the email"})
 			return
 		}	
 
-		// hash password
-		password := HashPassword(*user.Password)
-		user.Password = &password
+		
 
 		phoneCount, err := userCollection.CountDocuments(ctx, bson.M{"phone": user.Phone})
 
@@ -201,6 +228,10 @@ func SignUp() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "This email or phone already exists in the database"})
 			return
 		}
+
+		// hash password
+		password := HashPassword(*user.Password)
+		user.Password = &password
 
 		user.Created_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
 		user.Updated_at, _ = time.Parse(time.RFC3339, time.Now().Format(time.RFC3339))
@@ -226,7 +257,7 @@ func SignUp() gin.HandlerFunc {
 
 		fmt.Println("The new user details are ", result)
 
-		c.JSON(http.StatusOK, result)
+		c.JSON(http.StatusOK, result)	
 
 	}
 }
@@ -240,11 +271,11 @@ func HashPassword(password string) string {
 
 	}
 
-	return string(bytes)
+	return string(bytes) 
 
 }
 
-func VerifyPassword(userPassword string, providedPassword string) (bool, string) {
+func VerifyPassword(userPassword string, providedPassword string) (bool, string) { 
 
 	err := bcrypt.CompareHashAndPassword([]byte(providedPassword), []byte(userPassword))
 	check := true

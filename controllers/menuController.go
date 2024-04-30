@@ -18,6 +18,13 @@ import (
 
 var menuCollection *mongo.Collection = database.OpenCollection(database.Client, "menu")
 
+// @Summary        Returns slice of menus 
+// @Description    Returns an array of menus from the menucollection in restaurent database.
+// @Tags           menu
+// @Produce        application/json
+// @Security        @Security.require(true)
+// @Success        200 {array} models.Menu "slice of menus "
+// @Router         /menus [get]
 func GetMenus() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -41,6 +48,16 @@ func GetMenus() gin.HandlerFunc {
 	}
 }
 
+// @Summary        Retrieves a menu  with specific menu id
+// @Description    Retrieves a menu with specific menu id from the menu collection
+// @Tags           menu
+// @Accept         application/json
+// @Produce        application/json
+// @Param          menu_id path string true "menu_id"
+// @Security       @Security.require(true)
+// @Success        200 {object} models.Menu "Details of a specific menu"
+// @Failure        500 {string} http.StatusInternalServerError "Internal Server Error in mongodb"
+// @Router         /menus/{menu_id} [get]
 func GetMenu() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -61,6 +78,17 @@ func GetMenu() gin.HandlerFunc {
 	}
 }
 
+
+// @Summary        Creates a new menu 
+// @Description    Creates a menu resource on the server
+// @Tags           menu
+// @Accept         application/json
+// @Produce        application/json
+// @Param          Menu body models.Menu true  "Menu object"
+// @Security       @Security.require(true)
+// @Success        201 {object} models.Menu "New menu created" 
+// @Failure        500 {string} http.StatusInternalServerError "Internal Server Error while creating a new menu"
+// @Router         /menus  [post]
 func CreateMenu() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -105,6 +133,18 @@ func inTimeSpan(start, end, check time.Time) bool {
 	return start.After(time.Now()) && end.After(start)
 }
 
+// @Summary        Updates an menu resource
+// @Description    Updates an existing menu resource in the menu collection
+// @Tags           menu
+// @Accept         application/json
+// @Produce        application/json 
+// @Param          menu_id path string true "ID of the menu resource to update"
+// @Param          Menu body models.Menu true  "Menu object"
+// @Security       @Security.require(true)
+// @Success        200 {object} models.Menu "menu got updated with new body"
+// @Failure        500 {string} http.StatusInternalServerError "Internal Server Error while updating food"
+// @Failure        404 {string} http.StatusBadRequest "Bad Request"
+// @Router         /menu/{menu_id} [patch]
 func UpdateMenu() gin.HandlerFunc {
 	return func(c *gin.Context) {
 

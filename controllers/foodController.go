@@ -20,15 +20,23 @@ import (
 )
 
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "foods")
-var validate = validator.New()
+var validate = validator.New() 
 
+// @Summary              Returns slice of foods
+// @Description          Returns an array of foods from the ordercollection in restaurent database.
+// @Tags                 foods
+// @Security             @Security.require(true)
+// @Produce              application/json
+// @Success              200 {array} models.Food "slice of orders"
+// @Router               /foods [get]
 func GetFoods() gin.HandlerFunc {
-	return func(c *gin.Context) {
+	return func(c *gin.Context) { 
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
+		defer cancel()
 
 		recordPerPage, err := strconv.Atoi(c.Query("recordPerPage"))
-		if err != nil || recordPerPage < 1 {
+		if err != nil || recordPerPage < 1 { 
 			recordPerPage = 10
 
 		} 
@@ -39,31 +47,34 @@ func GetFoods() gin.HandlerFunc {
 		}
 
 		startIndex := (page - 1) * recordPerPage
-		startIndex, err = strconv.Atoi(c.Query("startindex"))
 
 		matchStage := bson.D{{Key: "$match", Value: bson.D{{}}}}
-		groupStage := bson.D{{Key: "$group", Value: bson.D{{Key: "_id", Value: bson.D{{Key: "_id", Value: "null"}}}, {Key: "total_count", Value: bson.D{{Key: "$sum", Value: 1}}}, {Key: "data", Value: bson.D{{Key: "$push", Value: "$$ROOT"}}}}}} // push : it is an opertor fucntion , it pushes the data into documents
-		// $$ROOT: it is the document or data which contains the output of the previous stage of the pipeline .
-		//project stage is used to define the values which we want to send to the frontend
+		groupStage := bson.D{{Key: "$group", Value: bson.D{
+			{Key: "_id", Value: bson.D{
+				{Key: "_id", Value: "null"}}}, 
+			{Key: "total_count", Value: bson.D{{Key: "$sum", Value: 1}}}, 
+			{Key: "data", Value: bson.D{{Key: "$push", Value: "$$ROOT"}}}}}} 
+			
 		projectStage := bson.D{
 			{
 				Key: "$project", Value: bson.D{
 					{Key: "_id", Value: 0},
 					{Key: "total_count", Value: 1},
 					{Key: "food_items", Value: bson.D{{Key: "$slice", Value: []interface{}{"$data", startIndex, recordPerPage}}}},
+					{Key: "data" , Value: 1},
 				}}}
 
 		result, err := foodCollection.Aggregate(ctx, mongo.Pipeline{
 			matchStage, groupStage, projectStage,
 		})
 
-		defer cancel()
+		
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing food items"})
 			return
 		}
 
-		var allFoods []bson.M
+		var allFoods []bson.M 
 
 		if err := result.All(ctx, &allFoods); err != nil {
 			log.Fatal(err)
@@ -73,6 +84,16 @@ func GetFoods() gin.HandlerFunc {
 	}
 }
 
+// @Summary              Retrieves a food with specific food id
+// @Description          Retrieves  a  food with specific food id from the  orders collection
+// @Tags                 foods
+// @Accept               application/json
+// @Produce              application/json
+// @Param                food_id path string true "food_id"
+// @Security             @Security.require(true)
+// @Success              200 {object} models.Food "Details of a speicific food"
+// @Failure              500 {string} http.StatusInternalServerError "Internal Server Error in mongodb"
+// @Router               /foods/{food_id} [get]
 func GetFood() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -95,7 +116,17 @@ func GetFood() gin.HandlerFunc {
 	}
 }
 
-func CreateFood() gin.HandlerFunc {
+// @Summary              Creates a food  resource
+// @Description          Creates a food resource on the server
+// @Tags                 foods
+// @Accept               application/json
+// @Produce              application/json
+// @Param                food body models.Food true "Food object"
+// @Security             @Security.require(true)
+// @Success              201 {object} models.Food "New food created" 
+// @Failure              500 {string} http.StatusInternalServerError "Internal Server Error while creating a new food"
+// @Router               /foods  [post]
+func CreateFood() gin.HandlerFunc {	
 	return func(c *gin.Context) {
 
 		ctx, cancel := context.WithTimeout(context.Background(), 100*time.Second)
@@ -144,18 +175,18 @@ func CreateFood() gin.HandlerFunc {
 	}
 }
 
-func round(num float64) int {
-
-	return int(num + math.Copysign(0.5, num)) //math.Copysign(0.5, num) returns a positive or negative 0.5 based on the sign of num. If num is positive, it returns 0.5; if num is negative, it returns -0.5.
-
-}
-
-func toFixed(num float64, precision int) float64 {
-	output := math.Pow(10, float64(precision)) //precision is the desired number of decimal places to keep after rounding.
-	return float64(round(num*output)) / output
-
-}
-
+// @Summary              Updates an food  resource
+// @Description          Updates an existing fodd  resource in the foods collection
+// @Tags                 foods
+// @Accept               application/json
+// @Produce              application/json 
+// @Param                food_id path string true "ID of the food resource to update"
+// @Security             @Security.require(true)
+// @Param                food body models.Food true "Food object"
+// @Success              200 {object} models.Food "food got updated with new body"
+// @Failure              500 {string} http.StatusInternalServerError "Internal Server Error while updating food"
+// @Failure              404 {string} http.StatusBadRequest "Bad Request"
+// @Router               /foods/{food_id} [patch]
 func UpdateFood() gin.HandlerFunc {
 	return func(c *gin.Context) {
 
@@ -230,3 +261,16 @@ func UpdateFood() gin.HandlerFunc {
 
 	}
 }
+
+func round(num float64) int { 
+
+	return int(num + math.Copysign(0.5, num)) //math.Copysign(0.5, num) returns a positive or negative 0.5 based on the sign of num. If num is positive, it returns 0.5; if num is negative, it returns -0.5.
+
+}
+
+func toFixed(num float64, precision int) float64 {
+	output := math.Pow(10, float64(precision)) //precision is the desired number of decimal places to keep after rounding.
+	return float64(round(num*output)) / output
+
+} 
+

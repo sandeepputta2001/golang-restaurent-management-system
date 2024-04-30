@@ -15,4 +15,4 @@ type Menu struct {
 	Created_at time.Time          `json:"created_at"`
 	Updated_at time.Time          `json:"updated_at"`
 	Menu_id    string             `json:"menu_id"`
-}
+} 

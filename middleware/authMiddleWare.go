@@ -18,17 +18,17 @@ func Authentication() gin.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, gin.H{"error ": fmt.Sprintf("No authorisation Header Provided")})
 			c.Abort()
 			return
-		}
+		}  
 
-		claims, err := helper.ValidateToken(clientToken) 
+		claims, err := helper.ValidateToken(clientToken)
 
-		if err != "" {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		if err != "" { 
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err}) 
 			c.Abort() //In Go, c.Abort() is commonly associated with web application frameworks like Gin and Echo, and it's used to prematurely terminate the processing of a request and immediately return a response to the client without allowing further middleware functions or request handlers to execute.
 			return
 		}
 
-		c.Set("email", claims.Email)
+		c.Set("email", claims.Email) 
 		c.Set("first_name", claims.First_name)
 		c.Set("last_name", claims.Last_name)
 		c.Set("uid", claims.Uid)

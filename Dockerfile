@@ -1,18 +1,20 @@
 FROM golang:1.21
 
-WORKDIR  /usr/src/app
+RUN mkdir /goapp
+
+WORKDIR  /goapp
 
 COPY go.mod go.sum ./
 
-RUN go mod download && go mod verify
+RUN go mod download
 
 COPY . .
 
-RUN go build -v -o /usr/local/bin/app 
+RUN go build -v -o /docker-go-restaurent
 
 RUN go get -d -v 
 
 
-EXPOSE 8080
+EXPOSE 8082
 
-CMD [ "app" ]
+CMD ["/docker-go-restaurent"]

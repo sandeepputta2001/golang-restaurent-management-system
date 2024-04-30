@@ -1,33 +1,52 @@
 package main
 
 import (
-	"fmt"
-	"go-restaurent-management-system/database"
 	middleware "go-restaurent-management-system/middleware"
 	"go-restaurent-management-system/routes"
 	"os"
 
 	"github.com/gin-gonic/gin"
-	"go.mongodb.org/mongo-driver/mongo"
+
+	//swagger
+	_ "go-restaurent-management-system/docs"
+
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
-var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "food")
+// @title       go-backend
+// @version     1.0
+// @description CRUP api's for go backend
 
-func main() { 
-	fmt.Println("this is the starting point")
+// @host       localhost:8000
+// @BasePath   /
+// @SecurityDefinitions.apiKey
+//   @in header
+//   @name token
+//   @description JWT token for authentication
+//   @type string
+func main() {  
 
-	port := os.Getenv("PORT")
+	port := os.Getenv("PORT") 
 
 	if port == "" {
 		port = "8000"
-	}
+	} 
+     
+	router := gin.New()
+	router.Use(gin.Logger())  
 
-	router := gin.New()       // The gin.New() function is typically used to create a new instance of the Gin Engine, which represents the router and middleware engine for your web application.
-	router.Use(gin.Logger()) //gin.Logger(): This is a predefined middleware provided by the gin framework. It's a logging middleware that automatically logs information about incoming requests and outgoing responses. When this middleware is used, it will log details such as the HTTP method, URL, status code, and request processing time for each request.
+	router.LoadHTMLGlob("templates/*")
+
+	router.GET("/swagger/*any",ginSwagger.WrapHandler(swaggerFiles.Handler)) 
+
+	routes.HomeRoutes(router)
 	routes.UserRoutes(router)
+
+	// middleware
 	router.Use(middleware.Authentication()) 
 
-	routes.FoodRoutes(router)
+	routes.FoodRoutes(router) 
 	routes.MenuRoutes(router)
 	routes.TableRoutes(router)
 	routes.OrderRoutes(router)

@@ -127,7 +127,7 @@ func Login() gin.HandlerFunc {
 
 		var user models.User
 
-		var foundUser models.User
+		var foundUser models.User 
 
 		// convert the incoming request's json into golang readable format
 		if err := c.BindJSON(&user); err != nil {
@@ -180,13 +180,13 @@ func Login() gin.HandlerFunc {
 // @Success       201 {object} models.User "New user created"
 // @Failure       500 {string} http.StatusInternalServerError "Internal Server Error while creating a new user"
 // @Router        /users/signup [post]
-func SignUp() gin.HandlerFunc {
+func SignUp() gin.HandlerFunc { 
 	return func(c *gin.Context) {
 
 		var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
 		defer cancel()
 
-		var user models.User
+		var user models.User 
 
 		//convert the incoming data from the http request into golang readable format
 
@@ -201,7 +201,7 @@ func SignUp() gin.HandlerFunc {
 
 		validationErr := validate.Struct(user)
 
-		if validationErr != nil {
+		if validationErr != nil { 
 			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
 			return
 		}
@@ -239,18 +239,18 @@ func SignUp() gin.HandlerFunc {
 		user.ID = primitive.NewObjectID() // ObjectID, which is a unique identifier commonly used in MongoDB. Each ObjectID is typically 12 bytes,
 		user.User_id = user.ID.Hex()     //The Hex() method converts the ObjectID to its hexadecimal string representation
 
-		// generate token and refresh token
+		// generate token and refresh token 
 
 		token, refreshToken, _ := helper.GenerateAllTokens(*user.Email, *user.First_name, *user.Last_name, user.User_id)
 
 		user.Token = &token
-		user.RefreshToken = &refreshToken
+		user.RefreshToken = &refreshToken 
 
 		// inserting the new user into the database
 
 		result, insertionErr := userCollection.InsertOne(ctx, user)
 
-		if insertionErr != nil {
+		if insertionErr != nil { 
 			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while inserting user data into the database "})
 			return
 		}
@@ -262,7 +262,7 @@ func SignUp() gin.HandlerFunc {
 	}
 }
 
-func HashPassword(password string) string {
+func HashPassword(password string) string { 
 
 	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14) //The 14 signifies the cost factor for the bcrypt password hashing algorithm. Bcrypt is designed to be slow and computationally expensive, which makes it resistant to brute-force and dictionary attacks. The cost factor determines how many iterations of the underlying Blowfish encryption algorithm are applied to hash the password. Higher cost factors result in more iterations and, therefore, slower hash generation.
 

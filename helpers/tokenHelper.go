@@ -71,14 +71,14 @@ func GenerateAllTokens(email string, firstName string, lastName string, uid stri
 	return token, refreshToken, err
 } 
 
-func UpdateAllTokens(signedToken string, signedRefreshToken string, userId string) {
+func UpdateAllTokens(signedToken string, signedRefreshToken string, userId string) { 
 
-	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second)
-	defer cancel()
+	var ctx, cancel = context.WithTimeout(context.Background(), 100*time.Second) 
+	defer cancel() 
 
 	var updateObj primitive.D //In Go, the primitive.D type is used to represent a BSON document (Binary JSON) in MongoDB. The D stands for "Document," and it is a slice of primitive.E values, where each E represents a BSON element (field and value pair).
 
-	updateObj = append(updateObj, bson.E{Key: "token", Value: signedToken})
+	updateObj = append(updateObj, bson.E{Key: "token", Value: signedToken}) 
 	updateObj = append(updateObj, bson.E{Key: "refreshToken", Value: signedRefreshToken})
 
 	Updated_at, _ := time.Parse(time.RFC3339, time.Now().Format(time.RFC3339)) 
@@ -93,7 +93,7 @@ func UpdateAllTokens(signedToken string, signedRefreshToken string, userId strin
 		Upsert: &upsert, // Upsert is an option in the UpdateOptions struct that specifies whether to perform an upsert operation. An upsert operation updates an existing document or inserts a new document if no matching document is found.
 	} 
 
-	_, err := userCollection.UpdateOne(
+	_, err := userCollection.UpdateOne( 
 		ctx,
 		filter, // filtering the document to be updated
 		bson.D{

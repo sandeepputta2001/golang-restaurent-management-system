@@ -44,7 +44,7 @@ func GetFoods() gin.HandlerFunc {
 		page, err := strconv.Atoi(c.Query("page"))
 		if err != nil {
 			page = 1
-		}
+		} 
 
 		startIndex := (page - 1) * recordPerPage
 
@@ -80,8 +80,8 @@ func GetFoods() gin.HandlerFunc {
 			log.Fatal(err)
 		}
 
-		c.JSON(http.StatusOK, allFoods)
-	}
+		c.JSON(http.StatusOK, allFoods) 
+	} 
 }
 
 // @Summary              Retrieves a food with specific food id

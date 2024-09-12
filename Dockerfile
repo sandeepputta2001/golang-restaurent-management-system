@@ -15,6 +15,6 @@ RUN go build -v -o /docker-go-restaurent
 RUN go get -d -v 
 
 
-EXPOSE 8082
+EXPOSE 8000
 
 CMD ["/docker-go-restaurent"]
